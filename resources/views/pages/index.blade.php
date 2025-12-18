@@ -8,12 +8,29 @@
     icon="download"
 >
     <div class="flex down center">
-        <x-shipyard.ui.input type="url"
-            name="link"
-            label="Link do youtube'a"
-            icon="open-in-new"
-            required
-        />
+        <div class="grid but-mobile-down center" style="--col-count: 2;">
+            <x-shipyard.ui.input type="url"
+                name="link"
+                label="Link do youtube'a"
+                icon="open-in-new"
+                required
+            />
+
+            <x-shipyard.ui.input type="select"
+                name="format"
+                label="Format"
+                icon="shape"
+                required
+                :select-data="[
+                    'options' => [
+                        ['label' => 'MP3', 'value' => 'mp3'],
+                        ['label' => 'MP4', 'value' => 'mp4'],
+                        ['label' => 'WAV', 'value' => 'wav'],
+                    ],
+                ]"
+            />
+
+        </div>
 
         <x-shipyard.ui.button
             label="Pobierz"
@@ -23,16 +40,20 @@
             class="primary"
         />
     </div>
-
 </x-shipyard.app.section>
 
 <script>
 function goToDownloader() {
-    const linkInput = document.querySelector("input[name='link']");
-    const link = linkInput.value;
+    const inputs = document.querySelectorAll("input, select");
+    const linkInput = inputs[0];
+    const formatInput = inputs[1];
+
 
     window.open(
-        `{{ route('downloader') }}?link=${link}`,
+        `{{ route('downloader') }}?` + new URLSearchParams({
+            link: linkInput.value,
+            format: formatInput.value,
+         }),
         "_blank"
     );
 

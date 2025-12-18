@@ -3,33 +3,9 @@
 
 @section("content")
 
-<x-shipyard.app.section
-    title="Pobieranie"
-    icon="download"
->
-    <x-slot:buttons>
-        <x-shipyard.ui.button
-            :action="request('link')"
-            label="Źródło"
-            icon="open-in-new"
-            target="_blank"
-        />
-    </x-slot:buttons>
-
-    <div class="loader-bar" style="--progress: 0%">
-        Inicjowanie...
-    </div>
-
-    <h2 class="flex right center middle">
-        <span @popper(Dodanie do kolejki) role="progress-mark" data-lvl="1" class="accent"><x-shipyard.app.icon name="tray-plus" /></span>
-        <span @popper(Inicjalizacja) role="progress-mark" data-lvl="2" class="accent"><x-shipyard.app.icon name="timer-play" /></span>
-        <span @popper(Przetwarzanie) role="progress-mark" data-lvl="3" class="accent"><x-shipyard.app.icon name="cog" /></span>
-    </h2>
-</x-shipyard.app.section>
-
-<script defer>
+<script>
 function updateLoader(progress, text, light_up_progress = undefined) {
-    const loader = document.querySelector(".loader-bar");
+    const loader = document.querySelector(".progress-bar");
     const progresses = document.querySelectorAll("[role='progress-mark']");
 
     loader.style.setProperty("--progress", `${progress}%`);
@@ -52,7 +28,7 @@ function addToQueue() {
 
     fetch(`https://p.savenow.to/ajax/download.php?` + new URLSearchParams({
         copyright: 0,
-        format: "mp3",
+        format: "{{ request('format', 'mp3') }}",
         url: "{{ request('link') }}",
         api: "dfcb6d76f2f6a9894gjkege8a4ab232222",
     }))
@@ -84,7 +60,33 @@ function startProgressTracker(progress_url) {
             });
     }, 2e3);
 }
+</script>
 
+<x-shipyard.app.section
+    title="Pobieranie"
+    icon="download"
+>
+    <x-slot:buttons>
+        <x-shipyard.ui.button
+            :action="request('link')"
+            label="Źródło"
+            icon="open-in-new"
+            target="_blank"
+        />
+    </x-slot:buttons>
+
+    <x-shipyard.app.progress-bar>
+        Inicjowanie...
+    </x-shipyard.app.progress-bar>
+
+    <h2 class="flex right center middle">
+        <span @popper(Dodanie do kolejki) role="progress-mark" data-lvl="1" class="accent"><x-shipyard.app.icon name="tray-plus" /></span>
+        <span @popper(Inicjalizacja) role="progress-mark" data-lvl="2" class="accent"><x-shipyard.app.icon name="timer-play" /></span>
+        <span @popper(Przetwarzanie) role="progress-mark" data-lvl="3" class="accent"><x-shipyard.app.icon name="cog" /></span>
+    </h2>
+</x-shipyard.app.section>
+
+<script defer>
 addToQueue();
 </script>
 
