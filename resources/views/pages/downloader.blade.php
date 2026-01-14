@@ -5,11 +5,14 @@
 
 <script>
 function updateLoader(progress, text, light_up_progress = undefined) {
-    const loader = document.querySelector(".progress-bar");
+    const progressBar = document.querySelector(".progress-bar");
     const progresses = document.querySelectorAll("[role='progress-mark']");
 
-    loader.style.setProperty("--progress", `${progress}%`);
-    loader.innerHTML = text;
+    progressBar.style.setProperty("--progress", `${progress}%`);
+    progressBar.innerHTML = text;
+
+    baseTitle = `Pobieracz utworu | {{ setting("app_name") }}`;
+    document.title = `${text} ${progress}% | ${baseTitle}`;
 
     if (light_up_progress !== undefined) {
         progresses.forEach(tag => {
@@ -24,6 +27,9 @@ function updateLoader(progress, text, light_up_progress = undefined) {
 }
 
 function addToQueue() {
+    const detailsLoader = document.querySelector("#details .loader");
+
+    detailsLoader.classList.remove("hidden");
     updateLoader(0, "Dodawanie do kolejki...", 0.5);
 
     fetch(`https://p.savenow.to/ajax/download.php?` + new URLSearchParams({
@@ -35,6 +41,15 @@ function addToQueue() {
         .then(res => res.json())
         .then(res => {
             if (!res.success) throw new Error(res.error);
+
+            console.log(res.info);
+
+            document.querySelector(`#details .contents`).innerHTML = `
+                <div class="flex down middle">
+                    <img style="" src="${res.info.image}" alt="${res.info.title}">
+                    <h3>${res.info.title}</h3>
+                </div>
+            `;
 
             updateLoader(0, "Pobieranie...", 1);
             startProgressTracker(res.progress_url);
@@ -62,6 +77,16 @@ function startProgressTracker(progress_url) {
 }
 </script>
 
+<div class="grid but-mobile-down" style="--col-count: 2;">
+
+<x-shipyard.app.section
+    title="Szczegóły pliku"
+    icon="information"
+    id="details"
+>
+    <x-shipyard.app.loader />
+</x-shipyard.app.section>
+
 <x-shipyard.app.section
     title="Pobieranie"
     icon="download"
@@ -85,6 +110,8 @@ function startProgressTracker(progress_url) {
         <span @popper(Przetwarzanie) role="progress-mark" data-lvl="3" class="accent"><x-shipyard.app.icon name="cog" /></span>
     </h2>
 </x-shipyard.app.section>
+
+</div>
 
 <script defer>
 addToQueue();
