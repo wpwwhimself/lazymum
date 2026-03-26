@@ -52,7 +52,7 @@ function addToQueue() {
             `;
 
             updateLoader(0, "Pobieranie...", 1);
-            startProgressTracker(res.progress_url);
+            trackProgress(res.progress_url);
         })
         .catch(err => {
             loader.innerHTML = "Błąd: " + err.message;
@@ -60,20 +60,18 @@ function addToQueue() {
         });
 }
 
-function startProgressTracker(progress_url) {
-    const interval = setInterval(() => {
-        fetch(progress_url)
-            .then(res => res.json())
-            .then(res => {
-                if (res.success == 1) {
-                    clearInterval(interval);
-                    updateLoader(100, "Gotowe!", 3);
-                    window.open(res.download_url, "_blank");
-                } else {
-                    updateLoader(res.progress / 10, "Pobieranie...", (res.text == "Downloading" ? 2.5 : 1.5));
-                }
-            });
-    }, 2e3);
+function trackProgress(progress_url) {
+    fetch(progress_url)
+        .then(res => res.json())
+        .then(res => {
+            if (res.success == 1) {
+                updateLoader(100, "Gotowe!", 3);
+                window.open(res.download_url, "_blank");
+            } else {
+                updateLoader(res.progress / 10, "Pobieranie...", (res.text == "Downloading" ? 2.5 : 1.5));
+                setTimeout(() => trackProgress(progress_url), 2e3);
+            }
+        });
 }
 </script>
 
