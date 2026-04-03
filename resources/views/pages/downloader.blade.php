@@ -71,6 +71,9 @@ function trackProgress(progress_url) {
                 updateLoader(res.progress / 10, "Pobieranie...", (res.text == "Downloading" ? 2.5 : 1.5));
                 setTimeout(() => trackProgress(progress_url), 2e3);
             }
+        })
+        .catch(err => {
+            setTimeout(() => trackProgress(progress_url), 2e3);
         });
 }
 </script>
