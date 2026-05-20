@@ -68,7 +68,7 @@ function trackProgress(progress_url) {
                 updateLoader(100, "Gotowe!", 3);
                 window.open(res.download_url, "_blank");
             } else {
-                updateLoader(res.progress / 10, "Pobieranie...", (res.text == "Downloading" ? 2.5 : 1.5));
+                updateLoader(res.progress / 10, `Pobieranie... (${res.text})`, (res.text == "Downloading" ? 2.5 : 1.5));
                 setTimeout(() => trackProgress(progress_url), 2e3);
             }
         })
